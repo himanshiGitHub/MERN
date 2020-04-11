@@ -1,4 +1,7 @@
 {
     "mongoURI": "mongodb+srv://test:test@merncluster-vcwlc.mongodb.net/test?retryWrites=true&w=majority",
-    "jwtSecret":"mySecreteToken"
+    "jwtSecret":"mySecreteToken",
+    "githubClientId": "85fc445c50d9e222aadc",
+    "githubSecret":"608697d8c28ca5a9457520e24c44614ff2d8874d",
+    "githubToken": "feadeb5e6a1bf82cf58863f28cd3ed2b80311172"
 }

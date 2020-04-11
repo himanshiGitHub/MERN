@@ -5,6 +5,9 @@ const { check, validationResult } = require('express-validator');
 const Profile = require('../../models/Profile');
 const User = require('../../models/User');
 const mongoose = require('mongoose');
+const request = require('request');
+const config = require('config');
+const axios = require('axios');
 
 
 const normalize = require('normalize-url');
@@ -256,7 +259,6 @@ router.put('/education', [auth,[
     .not()
     .isEmpty()
 ]], (req,res) =>{
-    console.log('-----------------')
     const errors = validationResult(req);
     if(!errors.isEmpty()) {
         return res.status(400).json({errors: errors.array() });
@@ -282,7 +284,6 @@ router.put('/education', [auth,[
     Profile.findOne({user: req.user.id})
     .then((profile) => {
         profile.education.unshift(newEdu);
-        console.log('1111111111111111');
         profile.save()
         .then((savedprofile) => {
             return res.json(savedprofile);
@@ -316,6 +317,47 @@ router.delete('/education/:edu_id', auth, (req, res) => {
         console.log('error', err);
         return res.status(500).send('Server error')
     })
+})
+
+router.get('/github/:username', (req, res) =>{
+    // const options = {
+    //    uri: `http://api.github.com/users/${req.params.username}
+    //    /repos?per_page=5&sort=created:asc&client_id=${config.get('githubClientId')}
+    //    &client_secret=${config.get('githubSecret')}`,
+    //    method: 'GET',
+    //    headers: {'User-Agent': 'himanshiGitHub'}
+    // };
+    // console.log('1111111111111')
+
+    // request(options, (error,response,body) => {
+    //     console.log('22222222222', response )
+    //     if(error) console.log('error', error);
+    //     if(response.statusCode != 200) {
+    //         return res.status(404).json({msg: 'No Github profile found'});
+    //     } else {
+    //        return  res.json(JSON.parse(body));
+
+    //     }
+
+    // })
+
+    const uri = encodeURI(
+        `https://api.github.com/users/${req.params.username}/repos?per_page=5&sort=created:asc`
+      );
+      const headers = {
+        'user-agent': 'himanshiGitHub',
+        Authorization: `token ${config.get('githubToken')}`
+      };
+  
+      axios.get(uri, { headers })
+      .then((gitres) => {
+        return res.json(gitres.data);
+      })
+      .catch((err) => {
+        console.log('error', err);
+        return res.status(500).send('Server error')
+    })
+      
 })
 
 module.exports = router;
