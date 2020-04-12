@@ -146,25 +146,25 @@ router.get('/user/:userId', (req, res) => {
         })
 })
 
-router.delete('/',auth, (req, res) => {
-      //remove profile
+router.delete('/', auth, (req, res) => {
+    //remove profile
     Profile.findOneAndRemove({ user: req.user.id })
         .then((profileremoved) => {
             //remove user
-            User.findByIdAndRemove({_id:req.user.id})
-            .then((userDeleted) => {
+            User.findByIdAndRemove({ _id: req.user.id })
+                .then((userDeleted) => {
 
-                if(!userDeleted) {
-                    return res.status(400).json({ msg: 'PROFILE NOT FOUND' });
-                } else {
-                    return res.json({msg: 'User deleted!'});
-                }
-                
-            })
-            .catch((err) => {
-                console.log(err, 'errrrrrrrrrrrr')
-                return res.status(500).send('Server error')
-            })
+                    if (!userDeleted) {
+                        return res.status(400).json({ msg: 'PROFILE NOT FOUND' });
+                    } else {
+                        return res.json({ msg: 'User deleted!' });
+                    }
+
+                })
+                .catch((err) => {
+                    console.log(err, 'errrrrrrrrrrrr')
+                    return res.status(500).send('Server error')
+                })
         })
         .catch((err) => {
             console.log(err, 'errrrrrrrrrrrr')
@@ -173,21 +173,21 @@ router.delete('/',auth, (req, res) => {
 })
 
 
-router.put('/experience', [auth,[  
+router.put('/experience', [auth, [
     check('title', 'Title is required')
-    .not()
-    .isEmpty(),
-  check('company', 'Company is required')
-    .not()
-    .isEmpty(),
-  check('from', 'From date is required and needs to be from the past')
-    .not()
-    .isEmpty()
-    .custom((value, { req }) => (req.body.to ? value < req.body.to : true))
-]], (req,res) =>{
+        .not()
+        .isEmpty(),
+    check('company', 'Company is required')
+        .not()
+        .isEmpty(),
+    check('from', 'From date is required and needs to be from the past')
+        .not()
+        .isEmpty()
+        .custom((value, { req }) => (req.body.to ? value < req.body.to : true))
+]], (req, res) => {
     const errors = validationResult(req);
-    if(!errors.isEmpty()) {
-        return res.status(400).json({errors: errors.array() });
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
     }
     const {
         title,
@@ -207,61 +207,61 @@ router.put('/experience', [auth,[
         current,
         description
     };
-    Profile.findOne({user: req.user.id})
-    .then((profile) => {
-        profile.experience.unshift(newExp);
-        profile.save()
-        .then((saveprofile) => {
-            return res.json(saveprofile);
+    Profile.findOne({ user: req.user.id })
+        .then((profile) => {
+            profile.experience.unshift(newExp);
+            profile.save()
+                .then((saveprofile) => {
+                    return res.json(saveprofile);
+                })
+                .catch((err) => {
+                    console.log('error', err);
+                    return res.status(500).send('Server error')
+                })
         })
         .catch((err) => {
             console.log('error', err);
             return res.status(500).send('Server error')
         })
-    })
-    .catch((err) => {
-        console.log('error', err);
-        return res.status(500).send('Server error')
-    })
 })
 
 
 router.delete('/experience/:exp_id', auth, (req, res) => {
-    Profile.findOne({user: req.user.id})
-    .then((profile) => {
-        // Get removed index 
-        const removedIndex = profile.experience.map(item => item.id)
-        .indexOf(req.params.exp_id);
-        profile.experience.splice(removedIndex, 1);
-        profile.save();
-        return profile;
-    })
-    .then((updatedProfile) => {
-        return res.json(updatedProfile);
-    })
-    .catch((err) => {
-        console.log('error', err);
-        return res.status(500).send('Server error')
-    })
+    Profile.findOne({ user: req.user.id })
+        .then((profile) => {
+            // Get removed index 
+            const removedIndex = profile.experience.map(item => item.id)
+                .indexOf(req.params.exp_id);
+            profile.experience.splice(removedIndex, 1);
+            profile.save();
+            return profile;
+        })
+        .then((updatedProfile) => {
+            return res.json(updatedProfile);
+        })
+        .catch((err) => {
+            console.log('error', err);
+            return res.status(500).send('Server error')
+        })
 })
 
-router.put('/education', [auth,[  
+router.put('/education', [auth, [
     check('school', 'School is required')
-    .not()
-    .isEmpty(),
-  check('degree', 'Degree is required')
-    .not()
-    .isEmpty(),
-  check('from', 'From is required')
-    .not()
-    .isEmpty(),  
-  check('fieldofstudy', 'Field of study is required.')
-    .not()
-    .isEmpty()
-]], (req,res) =>{
+        .not()
+        .isEmpty(),
+    check('degree', 'Degree is required')
+        .not()
+        .isEmpty(),
+    check('from', 'From is required')
+        .not()
+        .isEmpty(),
+    check('fieldofstudy', 'Field of study is required.')
+        .not()
+        .isEmpty()
+]], (req, res) => {
     const errors = validationResult(req);
-    if(!errors.isEmpty()) {
-        return res.status(400).json({errors: errors.array() });
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
     }
     const {
         school,
@@ -281,45 +281,45 @@ router.put('/education', [auth,[
         current,
         description
     };
-    Profile.findOne({user: req.user.id})
-    .then((profile) => {
-        profile.education.unshift(newEdu);
-        profile.save()
-        .then((savedprofile) => {
-            return res.json(savedprofile);
+    Profile.findOne({ user: req.user.id })
+        .then((profile) => {
+            profile.education.unshift(newEdu);
+            profile.save()
+                .then((savedprofile) => {
+                    return res.json(savedprofile);
+                })
+                .catch((err) => {
+                    console.log('error', err);
+                    return res.status(500).send('Server error')
+                })
         })
         .catch((err) => {
             console.log('error', err);
             return res.status(500).send('Server error')
         })
-    })
-    .catch((err) => {
-        console.log('error', err);
-        return res.status(500).send('Server error')
-    })
 })
 
 router.delete('/education/:edu_id', auth, (req, res) => {
-    Profile.findOne({user: req.user.id})
-    .then((profile) => {
-        // Get removed index 
-        const removedIndex = profile.education
-        .map(item => item.id)
-        .indexOf(req.params.edu_id);
-        profile.education.splice(removedIndex, 1);
-        profile.save();
-        return profile;
-    })
-    .then((updatedProfile) => {
-        return res.json(updatedProfile);
-    })
-    .catch((err) => {
-        console.log('error', err);
-        return res.status(500).send('Server error')
-    })
+    Profile.findOne({ user: req.user.id })
+        .then((profile) => {
+            // Get removed index 
+            const removedIndex = profile.education
+                .map(item => item.id)
+                .indexOf(req.params.edu_id);
+            profile.education.splice(removedIndex, 1);
+            profile.save();
+            return profile;
+        })
+        .then((updatedProfile) => {
+            return res.json(updatedProfile);
+        })
+        .catch((err) => {
+            console.log('error', err);
+            return res.status(500).send('Server error')
+        })
 })
 
-router.get('/github/:username', (req, res) =>{
+router.get('/github/:username', (req, res) => {
     // const options = {
     //    uri: `http://api.github.com/users/${req.params.username}
     //    /repos?per_page=5&sort=created:asc&client_id=${config.get('githubClientId')}
@@ -343,21 +343,21 @@ router.get('/github/:username', (req, res) =>{
 
     const uri = encodeURI(
         `https://api.github.com/users/${req.params.username}/repos?per_page=5&sort=created:asc`
-      );
-      const headers = {
+    );
+    const headers = {
         'user-agent': 'himanshiGitHub',
         Authorization: `token ${config.get('githubToken')}`
-      };
-  
-      axios.get(uri, { headers })
-      .then((gitres) => {
-        return res.json(gitres.data);
-      })
-      .catch((err) => {
-        console.log('error', err);
-        return res.status(500).send('Server error')
-    })
-      
+    };
+
+    axios.get(uri, { headers })
+        .then((gitres) => {
+            return res.json(gitres.data);
+        })
+        .catch((err) => {
+            console.log('error', err);
+            return res.status(500).send('Server error')
+        })
+
 })
 
 module.exports = router;
